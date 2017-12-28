@@ -1,6 +1,5 @@
 #include "imageview.h"
 
-
 void ImageView::wheelEvent(QWheelEvent *event)
 {
     float delta=event->delta();

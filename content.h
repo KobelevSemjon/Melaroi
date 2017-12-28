@@ -5,13 +5,12 @@
 #include <QFileDialog>
 #include <vector>
 
-
 class Content: public QDir
 {
     std::vector<QString> fileNames;
 public:
     Content(){}
-
+    size_t size(){return fileNames.size();}
     void reset()
     {
         fileNames.clear();
@@ -26,8 +25,10 @@ public:
     {
         return absolutePath()+'/'+fileNames[i];
     }
+    QString name(int i)
+    {
+        return fileNames[i];
+    }
 };
-
-
 
 #endif // CONTENT_H
