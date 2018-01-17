@@ -4,31 +4,19 @@
 #include <QDir>
 #include <QFileDialog>
 #include <vector>
-
+/*!
+ @brief Класс-список элементов папки.
+ @details Данный класс обеспечивает удобный интерфейс для создания списка имен элементов папки, посредством вызова стандартного диалгового окна.
+ */
 class Content: public QDir
 {
     std::vector<QString> fileNames;
 public:
-    Content(){}
-    size_t size(){return fileNames.size();}
-    void reset()
-    {
-        fileNames.clear();
-        setPath(QFileDialog::getExistingDirectory());
-        auto EntryList=entryList();
-        fileNames.reserve(EntryList.size());
-        for (auto i=EntryList.begin();i!=EntryList.end();++i)
-            fileNames.push_back(*i);
-    }
-
-    QString operator [](int i)
-    {
-        return absolutePath()+'/'+fileNames[i];
-    }
-    QString name(int i)
-    {
-        return fileNames[i];
-    }
+    Content();
+    size_t size();
+    void reset();
+    QString operator [](int i);
+    QString name(int i);
 };
 
 #endif // CONTENT_H

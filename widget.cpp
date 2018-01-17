@@ -1,6 +1,11 @@
 #include "widget.h"
 #include "ui_widget.h"
-
+/*!
+ * \brief Конструктор главного окна.
+ * \details Отвечает за предварительную форму главного окна (Раскрывает полностью), настраивает и свзывает элементы
+ * формы между собой, обучает классификатор clf по данныи из clf.sqlite или, если существует, из clf.csv.
+ * \param parent - родительский виджет (0)
+ */
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Widget)
@@ -19,24 +24,39 @@ Widget::Widget(QWidget *parent) :
     connect(ui->PB_answers,SIGNAL(clicked()),this,SLOT(GenerateAnswers()));
     connect(ui->LW_images,SIGNAL(currentRowChanged(int)),this,SLOT(Load(int)));
     connect(ui->PB_classifier,SIGNAL(clicked(bool)),this,SLOT(GenerateClassifier()));
-
-
     folder.setNameFilters({"*.jpg"});
 
-    SDataFrame dump("clf.csv");
-    std::vector<double> Y = dump.col(0);
+    SDataFrame sample;
+    if (QFile("clf.csv").exists())
+    {
+        sample = SDataFrame("clf.csv");
+    }
+    else
+    {
+        Database db("clf.sqlite");
+        sample = db.getTable("sample");
+    }
+    std::vector<double> Y = sample.col(0);
     std::vector<int> iY(Y.size());
     for(size_t i=0;i<Y.size();++i)
         if (Y[i]!=0) iY[i]=1;
-    dump.removeColumn(0);
-    clf.fit(dump,iY);    
+    sample.removeColumn(0);
+    clf.fit(sample,iY);
 }
 
+/*!
+ * \brief Деструктор формы.
+ */
 Widget::~Widget()
 {
     delete ui;
 }
 
+/*!
+ * \brief Обработчик события - (пере)выбор папки с изображениями.
+ * \details Срабатывает при нажатии на кнопку PB_open. Открывает стандартное диалговое окно ОС в которой нужно выбрать папку
+ * с изображениями в формате .jpg. При этом в списке LW_images отобразяться найденные изображения.
+ */
 void Widget::Open()
 {
     folder.reset();
@@ -47,6 +67,11 @@ void Widget::Open()
 }
 //QTime t; t.start();qDebug()<<t.elapsed();
 
+/*!
+ * \brief Обработчик события - загрузка изображения.
+ * \details Обеспечиает загрузку выбранного в LW_images изображения. При этом запускается основной алгоритм программы.
+ * \param num - номер строки в списке LW_images
+ */
 void Widget::Load(int num)
 {
     if (num!=-1)
@@ -54,8 +79,8 @@ void Widget::Load(int num)
 
         ui->GV_main->scene()->clear();
         QString path = folder[num];
-        QImage image(path);
 
+        QImage image(path);
         SMainComponents mc(image);
         SMatrix first(image,mc.first());
         SThreshold<BINARY> bin;
@@ -87,6 +112,12 @@ void Widget::Load(int num)
     }
 }
 
+/*!
+ * \brief Обработчик события - генерирование таблицы-"Объекты признаки".
+ * \details При нажатии на PB_table по всем изображениям папки выполняет процедуру описания сегментов по планам R,G,B,H,S,Br и
+ * Fm,Sm,Tm(см. SMainComponents). Вычисляемые признаки - все из SHistogram и SAdjacencyMatrix (шаг 1).
+ * Результат пишется в файл result.csv в той же директории, что и программа.
+ */
 void Widget::GenerateTable()
 {
     SDataFrame result;
@@ -126,6 +157,12 @@ void Widget::GenerateTable()
     ui->label->setText("result.csv");
 }
 
+/*!
+ * \brief Обработчик события - генерирование вектора ответов.
+ * \details При нажатии PB_answers, в открывшемся диалговом окне нужно задать папку с размеченными изображениями.
+ * О том как приготовить разметку см. "Руководство пользователя". Результатом является файл answers.csv (в директории программы)
+ * с вектором ответов.
+ */
 void Widget::GenerateAnswers()
 {
     ui->label->clear();
@@ -167,6 +204,12 @@ void Widget::GenerateAnswers()
     }
 }
 
+/*!
+ * \brief Обработчик события - генерирование обучающей выборки и вектора ответов для классификатора.
+ * \details При нажатии PB_сlassifier, в открывшемся диалговом окне нужно задать папку с размеченными изображениями.
+ * О том как приготовить разметку см. "Руководство пользователя". Результатом является файл clf.csv (в директории программы)
+ * с обучающей выборкой и вектором ответов.
+ */
 void Widget::GenerateClassifier()
 {
     ui->label->clear();

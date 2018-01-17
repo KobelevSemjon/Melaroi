@@ -5,7 +5,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -22,8 +22,7 @@ SOURCES +=\
     SLib\Classifying\skneighborsclassifier.cpp
 SOURCES +=\
     SLib\Components\sfunctors.cpp\
-    SLib\Components\slinearalgebra.cpp\
-    SLib\Components\steacher.cpp\
+    SLib\Components\slinearalgebra.cpp\    
     SLib\Components\smaincomponents.cpp
 SOURCES +=\
     SLib\Core\sdataframe.cpp\
@@ -32,7 +31,8 @@ SOURCES +=\
     SLib\Core\ssegmentationmap.cpp
 SOURCES +=\
     SLib\Features\sadjacencymatrix.cpp\
-    SLib\Features\shistogram.cpp
+    SLib\Features\shistogram.cpp\
+    SLib\Features\steacher.cpp
 SOURCES +=\
     SLib\Processing\sprocessing.cpp\
     SLib\Processing\sconveyor.cpp\
@@ -53,14 +53,14 @@ HEADERS  +=\
     SLib/components.h \
     SLib/core.h \
     SLib/features.h \
-    SLib/processing.h
+    SLib/processing.h \
+    database.h
 HEADERS +=\
     SLib\Classifying\sabstractclassifier.h\
     SLib\Classifying\skneighborsclassifier.h
 HEADERS +=\
     SLib\Components\sfunctors.h\
     SLib\Components\slinearalgebra.h\
-    SLib\Components\steacher.h\
     SLib\Components\smaincomponents.h
 HEADERS +=\
     SLib\Core\sdataframe.h\
@@ -70,7 +70,8 @@ HEADERS +=\
 HEADERS +=\
     SLib\Features\sabstractfeatures.h\
     SLib\Features\sadjacencymatrix.h\
-    SLib\Features\shistogram.h
+    SLib\Features\shistogram.h\
+    SLib\Features\steacher.h
 HEADERS +=\
     SLib\Processing\sprocessing.h\
     SLib\Processing\sconveyor.h\
